@@ -53,7 +53,7 @@ export const ParamsTab: React.FC<ParamsTabProps> = ({ params, setParams }) => {
         </Button>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border-none">
         <Table>
           <TableHeader>
             <TableRow>

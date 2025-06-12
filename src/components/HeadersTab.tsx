@@ -53,7 +53,7 @@ export const HeadersTab: React.FC<HeadersTabProps> = ({ headers, setHeaders }) =
         </Button>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border-none">
         <Table>
           <TableHeader>
             <TableRow>
