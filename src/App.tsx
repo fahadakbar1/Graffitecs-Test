@@ -1,11 +1,19 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
-import { Button } from "./components/ui/button";
+import 'react-toastify/dist/ReactToastify.css';
+// Removed incorrect import of Route from lucide-react
+import Index from "./pages";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button className="bg-red-200 text-red-500">Graffitecs Test</Button>
-    </div>
+    <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
   )
 };
 
