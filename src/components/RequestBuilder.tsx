@@ -10,6 +10,8 @@ import { BodyTab } from './BodyTab';
 import { AuthTab } from './AuthTab';
 import { toast } from 'react-toastify';
 import { Link2 } from 'lucide-react';
+import axios from 'axios';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
@@ -99,36 +101,45 @@ export const RequestBuilder: React.FC<RequestBuilderProps> = ({ onResponse }) =>
       }
 
       const startTime = Date.now();
-      const response = await fetch(finalUrl, {
+      
+      const config: AxiosRequestConfig = {
         method,
+        url: finalUrl,
         headers: requestHeaders,
-        body: ['POST', 'PUT', 'PATCH'].includes(method) && body.trim() ? body : undefined,
-      });
+        data: ['POST', 'PUT', 'PATCH'].includes(method) && body.trim() ? JSON.parse(body) : undefined,
+      };
 
+      const response: AxiosResponse = await axios(config);
       const endTime = Date.now();
       const responseTime = endTime - startTime;
-
-      let responseData;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        responseData = await response.json();
-      } else {
-        responseData = await response.text();
-      }
 
       onResponse({
         status: response.status,
         statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-        data: responseData,
+        headers: response.headers,
+        data: response.data,
         responseTime,
         url: finalUrl
       });
 
       toast.success(`Request completed in ${responseTime}ms`);
 
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Request failed");
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || "Request failed";
+      toast.error(errorMessage);
+      
+      // If there's a response, include it in the error
+      if (error.response) {
+        onResponse({
+          status: error.response.status,
+          statusText: error.response.statusText,
+          headers: error.response.headers,
+          data: error.response.data,
+          responseTime: 0,
+          url: url,
+          error: true
+        });
+      }
     } finally {
       setIsLoading(false);
     }
